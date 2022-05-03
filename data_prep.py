@@ -15,4 +15,7 @@ hiv_df = hiv_df.apply(lambda x: x.str.replace('<', '').str.replace(' ', ''))
 hiv_df = hiv_df.replace('...', 0)
 hiv_df = hiv_df.apply(lambda x: pd.to_numeric(x))
 
-#print(hiv_df.head())
+hiv_df = hiv_df.reset_index()
+
+hiv_df_long = pd.melt(hiv_df, id_vars = "Country", value_vars = hiv_df.columns[1:], var_name = "Year", value_name = "Cases")
+print(hiv_df_long.head())
