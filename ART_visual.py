@@ -7,14 +7,24 @@ from vega_datasets import data
 @st.cache
 def load_data():
 
-    art_df = pd.read_csv('data/ART_treatment.csv', index_col = 0)
-    art_df.columns = art_df.columns.map(int)
-    periods = art_df.columns
-    art_df.reset_index(inplace=True)
-    art_df = art_df.rename(columns = {'index':'Country'})
-    art_df = art_df.melt(id_vars='Country', value_vars = periods, var_name = 'year', value_name = 'ART_rate')
-    art_df['metric'] = 'ART_rate'
+    # Loading ART treatment rate data
+
+    art_data = pd.read_csv('data/ART_treatment_pct.csv', index_col = 0)
+    periods = art_data.columns
+    art_data.reset_index(inplace=True)
+    art_data = art_data.rename(columns = {'index':'Country'})
     
+    # Converting data into long format
+
+    art_df = art_data.melt(id_vars='Country', value_vars = periods, var_name = 'year', value_name = 'ART_rate')
+    art_df['metric'] = 'ART_rate'
+
+    #Replacing <1 and >98 to 1 and 98 respectively
+    
+    art_df['year'] = art_df['year'].replace(['<1'],0.9)
+    art_df['year'] = art_df['year'].replace(['>98'],98.1)
+    art_df['year'] = art_df['year'].replace(['...'],0)
+
     return art_df
 
 # Loading the ART treatment data
