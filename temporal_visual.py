@@ -5,6 +5,9 @@ import altair as alt
 import streamlit as st
 from vega_datasets import data
 
+#load data
+from 'data_prep.py' import hiv_df_long
+
 ## Set up basic world map as template backgorund
 source = alt.topo_feature(data.world_110m.url, 'countries')
 
@@ -21,4 +24,4 @@ background = alt.Chart(source
     height=height
 ).project(project)
 
-#background
+background
