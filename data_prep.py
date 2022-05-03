@@ -56,8 +56,8 @@ def export_hiv():
 
 ## Read in raw treatment data (rate and population)
 
-art_rate = pd.read_csv('ART_treatment_pct.csv', index_col = 0)
-art_pop = pd.read_csv('ART_treatment_pop.csv', index_col = 0)
+art_rate = pd.read_csv('data/ART_treatment_pct.csv', index_col = 0)
+art_pop = pd.read_csv('data/ART_treatment_pop.csv', index_col = 0)
 
 
 periods = art_rate.columns
