@@ -10,7 +10,7 @@ years = [str(i) for i in range(1990, 2021)]
 hiv_df = hiv_df[years]
 
 hiv_df = hiv_df.apply(lambda x: x.str.replace('<', '').str.replace(' ', ''))
-hiv_df = hiv_df.replace('...', 0)
+hiv_df = hiv_df.replace('...', -1)
 hiv_df = hiv_df.apply(lambda x: pd.to_numeric(x))
 
 hiv_df = hiv_df.reset_index()
