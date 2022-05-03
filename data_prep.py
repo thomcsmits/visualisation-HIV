@@ -52,5 +52,56 @@ def export_hiv():
 
 
 
-## Read in raw treatment data and clean
+## Hannah adding from here:
 
+## Read in raw treatment data (rate and population)
+
+art_rate = pd.read_csv('ART_treatment_pct.csv', index_col = 0)
+art_pop = pd.read_csv('ART_treatment_pop.csv', index_col = 0)
+
+
+periods = art_rate.columns
+
+## Clean rate data    
+## Convert treatment rate data into long format
+
+art_rate.reset_index(inplace=True)
+art_rate = art_rate.rename(columns = {'index':'Country'})
+art_rate = art_rate.melt(id_vars='Country', value_vars = periods, var_name = 'year', value_name = 'rate')
+
+## Add metric column
+art_rate['metric'] = 'ART_rate'
+
+## Replacing <1 and >98 to 0.5 and 98.5 respectively
+    
+art_rate['rate'] = art_rate['rate'].replace(['<1'],0.5)
+art_rate['rate'] = art_rate['rate'].replace(['>98'],98.5)
+art_rate['rate'] = art_rate['rate'].replace('...', 0)
+
+
+## Convert to int
+art_rate = art_rate.astype({'year':'int'})
+art_rate = art_rate.astype({'rate':'int'})
+
+## Clean population data
+
+art_pop = art_pop.replace('...', 0)
+
+## Calculate percentage change in treated population per year
+
+art_popchange = art_pop.pct_change(axis = 1)
+art_popchange = art_popchange.drop(labels = '2010', axis = 1)
+
+# Convert to long dataformat 
+art_popchange.reset_index(inplace=True)
+art_popchange = art_popchange.rename(columns = {'index':'Country'})
+periods = art_popchange.columns
+art_popchange = art_popchange.melt(id_vars='Country', value_vars = periods, var_name = 'year', value_name = 'ART_pct_change')
+art_popchange
+
+# Exporting treatment df
+def export_treatment_rate(): 
+    return art_rate
+
+def export_treament_pop():
+    return art_popchange
