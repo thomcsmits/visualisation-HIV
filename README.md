@@ -8,7 +8,7 @@ Team members:
 
 ---
 
-The deployed app is not yet available.
+The deployed app is available [here](https://share.streamlit.io/thomcsmits/visualisation-hiv/app.py).
 
 ---
 
