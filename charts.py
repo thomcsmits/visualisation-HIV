@@ -33,16 +33,6 @@ def return_temporal_map(data_subset, data_full):
             lookup = 'id',
             from_ = alt.LookupData(data_subset, 'country-code', ['Country','Year','Cases']),
         )
-     
-    chart_base_map = alt.Chart(source
-        ).properties( 
-            width = width,
-            height = height
-        ).project(project
-        ).transform_lookup(
-            lookup = 'id',
-            from_ = alt.LookupData(data_subset, 'country-code', ['Country','Year','Cases']),
-        )
 
     cases_scale = alt.Scale(domain=[data_full['Cases'].min(), data_full['Cases'].max()]) #we want the domain to stay the same regardless of subset
     cases_color = alt.Color(field = 'Cases', type = 'quantitative', scale = cases_scale)
@@ -133,6 +123,8 @@ def return_art_line(data_subset):
         title = 'Countries ranked overtime by the annual growth in the ART treated population',
         width = width * 1.2,
         height = height * 1.8,
+    ).resolve_scale(
+        color = 'independent'
     )
 
     return chart_treatment_change
@@ -141,8 +133,6 @@ def return_art_line(data_subset):
 def return_gdp_plot(data_subset, data_full):
     if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'Global GDP Distribution')
-    gdp_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
-    gdp_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -151,11 +141,11 @@ def return_gdp_plot(data_subset, data_full):
         ).project(project
         ).transform_lookup(
             lookup = "id",
-            from_= alt.LookupData(gdp_graph, "country-code", ['Country', 'Year', 'GDP_in_dollars']),
+            from_= alt.LookupData(data_subset, "country-code", ['Country', 'Year', 'GDP_in_dollars']),
         )
 
     # fix the color schema so that it will not change upon user selection
-    rate_scale = alt.Scale(domain=[gdp_graph_full['GDP_in_dollars'].min(), gdp_graph_full['GDP_in_dollars'].max()], scheme = "orangered")
+    rate_scale = alt.Scale(domain=[data_full['GDP_in_dollars'].min(), data_full['GDP_in_dollars'].max()], scheme = "orangered")
     rate_color = alt.Color(field="GDP_in_dollars", type="quantitative", scale=rate_scale)
     chart_gdp = chart_base.mark_geoshape().encode(
         color = rate_color,
@@ -176,8 +166,6 @@ def return_gdp_plot(data_subset, data_full):
 def return_ph_gdp_chart(data_subset, data_full):
     if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'% of GDP spent on Healthcare Worldwide')
-    ph_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
-    ph_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -186,11 +174,11 @@ def return_ph_gdp_chart(data_subset, data_full):
         ).project(project
         ).transform_lookup(
             lookup = "id",
-            from_= alt.LookupData(ph_graph, "country-code", ['Country', 'Year', 'GDP_percent_towards_health']),
+            from_= alt.LookupData(data_subset, "country-code", ['Country', 'Year', 'GDP_percent_towards_health']),
         )
 
     # fix the color schema so that it will not change upon user selection
-    rate_scale = alt.Scale(domain=[ph_graph_full['GDP_percent_towards_health'].min(), ph_graph_full['GDP_percent_towards_health'].max()], scheme = "greenblue")
+    rate_scale = alt.Scale(domain=[data_full['GDP_percent_towards_health'].min(), data_full['GDP_percent_towards_health'].max()], scheme = "greenblue")
     rate_color = alt.Color(field='GDP_percent_towards_health', type="quantitative", scale=rate_scale)
     chart_ph_gdp = chart_base.mark_geoshape().encode(
         color = rate_color,
@@ -212,9 +200,6 @@ def return_drug_chart(data_subset, data_full):
     if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'Global Death Rate due to Drug Abuse')
 
-    drug_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
-    drug_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
-    
     chart_base = alt.Chart(source
     ).properties( 
         width=width,
@@ -222,10 +207,10 @@ def return_drug_chart(data_subset, data_full):
     ).project(project
     ).transform_lookup(
         lookup = "id",
-        from_= alt.LookupData(drug_graph, "country-code", ['Country', 'Year', 'Drug_Deaths']),
+        from_= alt.LookupData(data_subset, "country-code", ['Country', 'Year', 'Drug_Deaths']),
     )
 
-    rate_scale = alt.Scale(domain=[drug_graph_full['Drug_Deaths'].min(), drug_graph_full['Drug_Deaths'].max()], scheme = "purplered")
+    rate_scale = alt.Scale(domain=[data_full['Drug_Deaths'].min(), data_full['Drug_Deaths'].max()], scheme = "purplered")
     rate_color = alt.Color(field='Drug_Deaths', type="quantitative", scale=rate_scale)
     chart_drug_death = chart_base.mark_geoshape().encode(
         color = rate_color,
@@ -240,4 +225,26 @@ def return_drug_chart(data_subset, data_full):
     )
 
     return chart_drug_map
+
+
+
+
+def return_drug_bar(data_subset):
+    drug_bar =  alt.Chart(data_subset).mark_bar().encode(
+                x=alt.X('Country', title = "Country", sort = 'y'),
+                y=alt.Y('Drug_Deaths', title = "Death Count"),
+                color=alt.Color('sum(Drug_Deaths):Q', legend=None, scale=alt.Scale(scheme='purplered')),
+                tooltip=["sum(Drug_Deaths):Q", "Country"]
+            ).properties(
+                title="Countries with maximum deaths due to drug abuse",
+                width=width,
+                height=height
+            ).transform_window(
+            rank='rank(Drug_Deaths)',
+            sort=[alt.SortField('Drug_Deaths', order='descending')]
+            #).transform_filter(
+            #    (alt.datum.rank < 30)
+                )
+
+    return drug_bar
 
