@@ -96,4 +96,123 @@ def export_treatment_rate():
     return art_rate
 
 def export_treament_pop():
-    return art_popchange
+    return 
+    
+
+
+## World GDP
+
+## read in GDP data
+gdp = pd.read_csv('data/gdp-per-capita-worldbank.csv')
+gdp = gdp.drop(['Code'], axis=1)
+gdp = gdp.rename(columns={"Entity": "Country"}) # Rename column to 'Country'
+gdp = gdp.rename(columns={"GDP per capita, PPP (constant 2017 international $)": "GDP_in_dollars"}) # Rename column to 'Country'
+
+## country mapping dictionary for GDP data
+country_mapping_gdp = {
+    "North Korea" : "Korea (Democratic People's Republic of)",
+    'Democratic Republic of the Congo' : 'Congo, Democratic Republic of the',
+    'South Korea' : 'Korea, Republic of',
+    'Moldova' : 'Moldova, Republic of',
+    'United Kingdom' : 'United Kingdom of Great Britain and Northern Ireland',
+    'Tanzania' : 'Tanzania, United Republic of',
+    'United States' : 'United States of America',
+    'Bolivia':'Bolivia (Plurinational State of)',
+    'Brunei':'Brunei Darussalam',
+    'Cape Verde':'Cabo Verde',
+    'Democratic Republic of Congo':'Congo, Democratic Republic of the',
+    "Cote d'Ivoire" : "Côte d'Ivoire",
+    'Iran':'Iran (Islamic Republic of)',
+    'Laos':"Lao People's Democratic Republic",
+    'Russia':'Russian Federation',
+    'Timor':'Timor-Leste',
+    'Venezuela':'Venezuela (Bolivarian Republic of)',
+    'Vietnam':'Viet Nam'}
+
+## rename countries based on dict
+for index, row in gdp.iterrows():
+    if row['Country'] in country_mapping_gdp.keys():
+        gdp.iloc[index, 0] = country_mapping_gdp[row['Country']]
+
+## remove country data that does not match temporal data
+exclusion = np.setxor1d(gdp['Country'].unique(), hiv_df_long['Country'].unique())
+gdp = gdp[~gdp['Country'].isin(exclusion)]
+
+## Add country codes and convert to int
+gdp = gdp.merge(
+    country_df[['Country', 'country-code']],
+    how = 'left',
+    on = 'Country')
+
+gdp['country-code'] = gdp['country-code'].astype(int)
+
+## reindex and drop extra index column
+gdp = gdp.reset_index()
+gdp = gdp.drop(['index'], axis=1)
+
+## Deaths due to drug abuse
+
+## read in drug and substance disorders data
+drug = pd.read_csv('deaths-substance-disorders.csv')
+drug = drug.drop(['Code'], axis=1)
+drug = drug.rename(columns={"Entity": "Country"}) # Rename column to 'Country'
+
+## rename countries based on gdp-dict
+for index, row in drug.iterrows():
+    if row['Country'] in country_mapping_gdp.keys():
+        drug.iloc[index, 0] = country_mapping_gdp[row['Country']]
+
+## sum over the different drug causitive agents
+drug['Drug_Deaths'] = drug.iloc[:,3:9].sum(axis=1)
+drug = drug.drop(drug.iloc[:,2:8] , axis=1)
+
+## Add country codes and convert to int
+drug = drug.merge(
+    country_df[['Country', 'country-code']],
+    how = 'left',
+    on = 'Country')
+
+## remove country data that does not match temporal data
+exclusion = np.setxor1d(drug['Country'].unique(), hiv_df_long['Country'].unique())
+drug = drug[~drug['Country'].isin(exclusion)]
+
+## reindex and drop extra index column
+drug = drug.reset_index()
+drug = drug.drop(['index'], axis=1)
+
+## Public Health Expense as a % of GDP
+
+## read in public healthcare expenses for GDP data
+ph_gdp = pd.read_csv('public-healthcare-spending-share-gdp.csv')
+ph_gdp = ph_gdp.drop(['Code'], axis=1)
+ph_gdp = ph_gdp.rename(columns={"Entity": "Country"})
+ph_gdp = ph_gdp.rename(columns={"Domestic general government health expenditure (% of GDP)": "GDP_percent_towards_health"})
+
+## rename countries based on gdp-dict
+for index, row in ph_gdp.iterrows():
+    if row['Country'] in country_mapping_gdp.keys():
+        ph_gdp.iloc[index, 0] = country_mapping_gdp[row['Country']]
+
+## Add country codes
+ph_gdp = ph_gdp.merge(
+    country_df[['Country', 'country-code']],
+    how = 'left',
+    on = 'Country')
+
+## remove country data that does not match temporal data
+exclusion = np.setxor1d(ph_gdp['Country'].unique(), hiv_df_long['Country'].unique())
+ph_gdp = ph_gdp[~ph_gdp['Country'].isin(exclusion)]
+
+## reindex and drop extra index column
+ph_gdp = ph_gdp.reset_index()
+ph_gdp = ph_gdp.drop(['index'], axis=1)
+
+## Export all 3 datasets (GDP, Drug Deaths, Public Health) as functions
+def export_gdp(): 
+    return gdp
+
+def export_drug():
+    return drug
+
+def export_ph_gdp():
+    return ph_gdp
