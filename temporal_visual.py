@@ -40,6 +40,12 @@ st.write('## HIV cases worldwide per year')
 year = st.slider('Year', min_value = int(hiv_df_long['Year'].min()), max_value = int(hiv_df_long['Year'].max()), value = 2010, step = 1)
 hiv_df_long_year = hiv_df_long[hiv_df_long['Year'] == str(year)]
 
+## Chart 2: linechart for selected countries
+countries = st.multiselect("Countries", hiv_df_long["Country"].unique())
+hiv_df_long_country = hiv_df_long[hiv_df_long['Country'].isin(countries)]
+
+
+
 chart_base_map = alt.Chart(source
     ).properties( 
         width=width,
@@ -69,6 +75,8 @@ chart_cases_map = alt.vconcat(map_background + chart_cases
 )
 
 st.altair_chart(chart_cases_map, use_container_width=True)
+
+
 
 ## Chart 2: linechart for selected countries
 countries = st.multiselect("Countries", hiv_df_long["Country"].unique())
