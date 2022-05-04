@@ -138,13 +138,11 @@ def return_art_line(data_subset):
     return chart_treatment_change
 
 
-##################################################################################################
-## GDP Data World Map
-
-def return_gdp_plot(data):
-    if (data.shape[0] == 0):
+def return_gdp_plot(data_subset, data_full):
+    if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'Global GDP Distribution')
-    gdp_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    gdp_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    gdp_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -157,11 +155,10 @@ def return_gdp_plot(data):
         )
 
     # fix the color schema so that it will not change upon user selection
-    rate_scale = alt.Scale(domain=[gdp_graph['GDP_in_dollars'].min(), gdp_graph['GDP_in_dollars'].max()], scheme = "orangered")
+    rate_scale = alt.Scale(domain=[gdp_graph_full['GDP_in_dollars'].min(), gdp_graph_full['GDP_in_dollars'].max()], scheme = "orangered")
     rate_color = alt.Color(field="GDP_in_dollars", type="quantitative", scale=rate_scale)
     chart_gdp = chart_base.mark_geoshape().encode(
         color = rate_color,
-        # P3.3 tooltip
         tooltip=["GDP_in_dollars:N", "Country:O", "Year:O"]
         ).properties(
         title=f'Global GDP'
@@ -176,11 +173,11 @@ def return_gdp_plot(data):
 
 
 ## GDP % Spent on Healthcare Data World Map
-
-def return_ph_gdp_chart(data):
-    if (data.shape[0] == 0):
+def return_ph_gdp_chart(data_subset, data_full):
+    if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'% of GDP spent on Healthcare Worldwide')
-    ph_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    ph_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    ph_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -193,7 +190,7 @@ def return_ph_gdp_chart(data):
         )
 
     # fix the color schema so that it will not change upon user selection
-    rate_scale = alt.Scale(domain=[ph_graph['GDP_percent_towards_health'].min(), ph_graph['GDP_percent_towards_health'].max()], scheme = "greenblue")
+    rate_scale = alt.Scale(domain=[ph_graph_full['GDP_percent_towards_health'].min(), ph_graph_full['GDP_percent_towards_health'].max()], scheme = "greenblue")
     rate_color = alt.Color(field='GDP_percent_towards_health', type="quantitative", scale=rate_scale)
     chart_ph_gdp = chart_base.mark_geoshape().encode(
         color = rate_color,
@@ -211,12 +208,12 @@ def return_ph_gdp_chart(data):
 
 
 ## Drug related Death Map
-
-def return_drug_chart(data):
-    if (data.shape[0] == 0):
+def return_drug_chart(data_subset, data_full):
+    if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'Global Death Rate due to Drug Abuse')
 
-    drug_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    drug_graph = data_subset.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    drug_graph_full = data_full.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
     
     chart_base = alt.Chart(source
     ).properties( 
@@ -228,7 +225,7 @@ def return_drug_chart(data):
         from_= alt.LookupData(drug_graph, "country-code", ['Country', 'Year', 'Drug_Deaths']),
     )
 
-    rate_scale = alt.Scale(domain=[drug_graph['Drug_Deaths'].min(), drug_graph['Drug_Deaths'].max()], scheme = "purplered")
+    rate_scale = alt.Scale(domain=[drug_graph_full['Drug_Deaths'].min(), drug_graph_full['Drug_Deaths'].max()], scheme = "purplered")
     rate_color = alt.Color(field='Drug_Deaths', type="quantitative", scale=rate_scale)
     chart_drug_death = chart_base.mark_geoshape().encode(
         color = rate_color,

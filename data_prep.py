@@ -97,7 +97,7 @@ def export_treatment_rate():
     return art_rate
 
 def export_treament_pop():
-    return 
+    return art_popchange
     
 
 
@@ -109,28 +109,7 @@ gdp = gdp.drop(['Code'], axis=1)
 gdp = gdp.rename(columns={"Entity": "Country"}) # Rename column to 'Country'
 gdp = gdp.rename(columns={"GDP per capita, PPP (constant 2017 international $)": "GDP_in_dollars"}) # Rename column to 'Country'
 
-## country mapping dictionary for GDP data
-country_mapping_gdp = {
-    "North Korea" : "Korea (Democratic People's Republic of)",
-    'Democratic Republic of the Congo' : 'Congo, Democratic Republic of the',
-    'South Korea' : 'Korea, Republic of',
-    'Moldova' : 'Moldova, Republic of',
-    'United Kingdom' : 'United Kingdom of Great Britain and Northern Ireland',
-    'Tanzania' : 'Tanzania, United Republic of',
-    'United States' : 'United States of America',
-    'Bolivia':'Bolivia (Plurinational State of)',
-    'Brunei':'Brunei Darussalam',
-    'Cape Verde':'Cabo Verde',
-    'Democratic Republic of Congo':'Congo, Democratic Republic of the',
-    "Cote d'Ivoire" : "Côte d'Ivoire",
-    'Iran':'Iran (Islamic Republic of)',
-    'Laos':"Lao People's Democratic Republic",
-    'Russia':'Russian Federation',
-    'Timor':'Timor-Leste',
-    'Venezuela':'Venezuela (Bolivarian Republic of)',
-    'Vietnam':'Viet Nam'}
-
-## rename countries based on dict
+## Not all countries are written the same way. country_gdp is an imported dictionary.
 for index, row in gdp.iterrows():
     if row['Country'] in country_mapping_gdp.keys():
         gdp.iloc[index, 0] = country_mapping_gdp[row['Country']]
@@ -154,7 +133,7 @@ gdp = gdp.drop(['index'], axis=1)
 ## Deaths due to drug abuse
 
 ## read in drug and substance disorders data
-drug = pd.read_csv('deaths-substance-disorders.csv')
+drug = pd.read_csv('data/deaths-substance-disorders.csv')
 drug = drug.drop(['Code'], axis=1)
 drug = drug.rename(columns={"Entity": "Country"}) # Rename column to 'Country'
 
@@ -184,7 +163,7 @@ drug = drug.drop(['index'], axis=1)
 ## Public Health Expense as a % of GDP
 
 ## read in public healthcare expenses for GDP data
-ph_gdp = pd.read_csv('public-healthcare-spending-share-gdp.csv')
+ph_gdp = pd.read_csv('data/public-healthcare-spending-share-gdp.csv')
 ph_gdp = ph_gdp.drop(['Code'], axis=1)
 ph_gdp = ph_gdp.rename(columns={"Entity": "Country"})
 ph_gdp = ph_gdp.rename(columns={"Domestic general government health expenditure (% of GDP)": "GDP_percent_towards_health"})
