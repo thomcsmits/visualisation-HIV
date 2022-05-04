@@ -252,7 +252,7 @@ def return_drug_bar(data_subset):
                 x=alt.X('Country', title = "Country", sort = 'y'),
                 y=alt.Y('Drug_Deaths', title = "Death Count"),
                 color=alt.Color('sum(Drug_Deaths):Q', legend=None, scale=alt.Scale(scheme='purplered')),
-                tooltip=["sum(Drug_Deaths):Q", "Country"]
+                tooltip=["Country", "sum(Drug_Deaths):Q"]
             ).properties(
                 title="Total deaths due to drugs between 1990-2020",
                 width=width,
