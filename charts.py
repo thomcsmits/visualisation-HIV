@@ -195,6 +195,24 @@ def return_ph_gdp_chart(data_subset, data_full):
     return chart_ph_gdp_map
 
 
+## Funding merged bar chart
+def return_funding_bar(data_subset):
+    chart_funding_bar = alt.Chart(data_subset).mark_bar().encode(
+        x='Country:O',
+        y='USD_per_million:Q',
+        color=alt.Color('Cost:N', scale = alt.Scale(scheme = "greenblue")), 
+        tooltip=["Country", "Year"], 
+        column = 'Year:N'
+    ).properties(
+    width = width,
+    height = height
+    )
+
+    return chart_funding_bar
+
+
+
+
 ## Drug related Death Map
 def return_drug_chart(data_subset, data_full):
     if (data_subset.shape[0] == 0):
@@ -238,7 +256,7 @@ def return_drug_bar(data_subset):
             ).properties(
                 title="Countries with maximum deaths due to drug abuse",
                 width=width,
-                height=height
+                height=height * 1.5
             ).transform_window(
             rank='rank(Drug_Deaths)',
             sort=[alt.SortField('Drug_Deaths', order='descending')]

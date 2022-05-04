@@ -3,7 +3,7 @@ import altair as alt
 import streamlit as st
 
 ## Load data
-from data_prep import export_hiv, export_treatment_rate, export_treament_pop, export_gdp, export_drug, export_ph_gdp
+from data_prep import export_hiv, export_treatment_rate, export_treament_pop, export_gdp, export_drug, export_ph_gdp, export_merged_gdp_ph
 hiv_df_long = export_hiv()
 art_rate = export_treatment_rate()
 art_popchange = export_treament_pop()
@@ -11,6 +11,7 @@ art_popchange = export_treament_pop()
 gdp = export_gdp()
 drug = export_drug()
 ph_gdp = export_ph_gdp()
+merged_gdp_ph = export_merged_gdp_ph()
 
 ## Allow using rows more than 5000
 alt.data_transformers.disable_max_rows(); 
@@ -20,7 +21,8 @@ alt.data_transformers.disable_max_rows();
 st.set_page_config(
     layout="wide",
 	initial_sidebar_state = "auto", 
-	page_title = "HIV_dashboard",
+	page_title = "HIV dashboard",
+    page_icon = 'img/hiv_icon.png'
 )
 
 
@@ -42,13 +44,12 @@ with st.sidebar:
 
 hiv_selection_lower = hiv_df_long[hiv_df_long['Country'].isin(countries)]
 art_selection_lower = art_popchange[art_popchange['Country'].isin(countries)]
-gdp_selection_lower = gdp[gdp['Country'].isin(countries)]
-ph_selection_lower = ph_gdp[ph_gdp['Country'].isin(countries)]
 drug_selection_lower = drug[drug['Country'].isin(countries)]
+
 
 ## Title and year option
 st.write('### HIV dashboard')
-st.write('#### Explore spatial and temporal HIV cases, ART and PrEP coverage, and social factors.')
+st.write('#### Explore spatial and temporal HIV cases, ART coverage, funding, and drug abuse.')
 
 year = st.slider('Year', min_value = int(hiv_df_long['Year'].min()), max_value = int(hiv_df_long['Year'].max()), value = 2010, step = 1)
 hiv_selection_upper = hiv_df_long[hiv_df_long['Year'] == str(year)]
@@ -64,15 +65,18 @@ if show_all == 'Selected':
     ph_selection_upper = ph_selection_upper[ph_selection_upper['Country'].isin(countries)]
     drug_selection_upper = drug_selection_upper[drug_selection_upper['Country'].isin(countries)]
 
+merged_gdp_ph_lower = merged_gdp_ph[merged_gdp_ph['Country'].isin(countries)]
+merged_gdp_ph_lower = merged_gdp_ph_lower[merged_gdp_ph_lower['Year'] == year]
 
 ## Loading in charts with subsetted data
-from charts import return_temporal_map, return_temporal_line, return_art_map, return_art_line, return_gdp_plot, return_ph_gdp_chart, return_drug_chart, return_drug_bar
+from charts import return_temporal_map, return_temporal_line, return_art_map, return_art_line, return_gdp_plot, return_ph_gdp_chart, return_funding_bar, return_drug_chart, return_drug_bar
 chart_cases_map = return_temporal_map(hiv_selection_upper, hiv_df_long)
 chart_cases_line = return_temporal_line(hiv_selection_lower)
 chart_art_map = return_art_map(art_selection_upper)
 chart_art_line = return_art_line(art_selection_lower)
 chart_gdp_map = return_gdp_plot(gdp_selection_upper, gdp)
 chart_ph_map = return_ph_gdp_chart(ph_selection_upper, ph_gdp)
+chart_funding_bar = return_funding_bar(merged_gdp_ph_lower)
 chart_drug_map = return_drug_chart(drug_selection_upper, drug)
 chart_drug_bar = return_drug_bar(drug_selection_lower)
 
@@ -83,9 +87,9 @@ def select_correct_chart(topic_selection_choice):
     if topic_selection_choice == 'ART coverage':
         return chart_art_map, chart_art_line
     if topic_selection_choice == 'GDP':
-        return chart_gdp_map, chart_cases_line
+        return chart_gdp_map, chart_funding_bar
     if topic_selection_choice == 'Healthcare funding':
-        return chart_ph_map, chart_cases_line
+        return chart_ph_map, chart_funding_bar
     if topic_selection_choice == 'Drug deaths':
         return chart_drug_map, chart_drug_bar
 
@@ -122,7 +126,7 @@ else:
     
     c5.altair_chart(chart_gdp_map, use_container_width=False)
     c6.altair_chart(chart_ph_map, use_container_width=False)
-    c7.altair_chart(chart_cases_line, use_container_width=False)
+    c7.altair_chart(chart_funding_bar, use_container_width=False)
     
     c9.altair_chart(chart_drug_map, use_container_width=False)
     c10.altair_chart(chart_drug_bar, use_container_width=False)

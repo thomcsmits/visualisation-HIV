@@ -187,7 +187,23 @@ ph_gdp = ph_gdp[~ph_gdp['Country'].isin(exclusion)]
 ph_gdp = ph_gdp.reset_index()
 ph_gdp = ph_gdp.drop(['index'], axis=1)
 
-## Export all 3 datasets (GDP, Drug Deaths, Public Health) as functions
+
+## Merge for percentages
+
+cols = ['Country',	'Year', 'country-code']
+merged_gdp_ph = gdp.join(ph_gdp.set_index(cols), on=cols)
+merged_gdp_ph = merged_gdp_ph.dropna()
+merged_gdp_ph['PH_dollars'] = (round(((merged_gdp_ph['GDP_in_dollars'] 
+                                    * merged_gdp_ph['GDP_percent_towards_health'])/100), 4)).astype(float)
+                                    
+merged_gdp_ph = pd.melt(merged_gdp_ph, id_vars=cols, value_vars=['GDP_in_dollars', 'PH_dollars'],
+                        value_name='USD_per_million', var_name='Cost')
+
+merged_gdp_ph.replace("GDP_in_dollars", "GDP Total without Pulic Health expenses", inplace=True)
+merged_gdp_ph.replace("PH_dollars", "GDP to Public Health", inplace=True)
+
+
+## Export all datasets (GDP, Drug Deaths, Public Health) as functions
 def export_gdp(): 
     return gdp
 
@@ -196,3 +212,6 @@ def export_drug():
 
 def export_ph_gdp():
     return ph_gdp
+
+def export_merged_gdp_ph():
+    return merged_gdp_ph
