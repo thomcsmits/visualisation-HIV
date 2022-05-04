@@ -46,37 +46,22 @@ show_all = st.radio('Do you want to display all countries or only selected?', ('
 
 if show_all == 'Selected':
     hiv_selection_upper = hiv_selection_upper[hiv_selection_upper['Country'].isin(countries)]
-    art_selection_upper = art_selection_upper[art_selection_upper['Country'].isin(countries)]\
+    art_selection_upper = art_selection_upper[art_selection_upper['Country'].isin(countries)]
 
 
+## Loading in charts with subsetted data
 from charts import return_temporal_map, return_temporal_line, return_art_map, return_art_line
-# chart_cases_map = return_temporal_map(hiv_selection_upper, hiv_df_long)
-# st.altair_chart(chart_cases_map, use_container_width=True)
-
-# chart_cases_line = return_temporal_line(hiv_selection_lower)
-# st.altair_chart(chart_cases_line, use_container_width=True)
-
-# chart_art_map = return_art_map(art_selection_upper)
-# st.altair_chart(chart_art_map, use_container_width=True)
-
-# chart_art_line = return_art_line(art_selection_lower)
-# st.altair_chart(chart_art_line, use_container_width=True)
-
-
-
-## combined
 chart_cases_map = return_temporal_map(hiv_selection_upper, hiv_df_long)
 chart_cases_line = return_temporal_line(hiv_selection_lower)
 chart_art_map = return_art_map(art_selection_upper)
 chart_art_line = return_art_line(art_selection_lower)
 
 
-#st.altair_chart(chart_cases_map, use_container_width = True)
+## Displaying in streamlit with layout
 comb = (chart_cases_map | chart_art_map) 
 st.altair_chart(comb, use_container_width=False)
 
 c1, c2 = st.columns(2)
-
 c1.altair_chart(chart_cases_line, use_container_width=False)
 c2.altair_chart(chart_art_line, use_container_width=False)
 

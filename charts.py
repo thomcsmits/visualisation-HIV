@@ -24,6 +24,9 @@ map_background = alt.Chart(source
 
 
 def return_temporal_map(data_subset, data_full):
+    if (data_subset.shape[0] == 0):
+        return map_background.properties(title=f'HIV cases worldwide')
+
     chart_base_map = alt.Chart(source
         ).properties( 
             width = width,
@@ -89,6 +92,9 @@ def return_temporal_line(data_subset):
 
 
 def return_art_map(data_subset):
+    if (data_subset.shape[0] == 0):
+        return map_background.properties(title=f'Proportion of HIV patients receiving ART therapy')
+
     chart_base = alt.Chart(source
         ).properties( 
             width = width,
