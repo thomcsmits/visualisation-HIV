@@ -78,7 +78,7 @@ def return_temporal_line(data_subset):
 
 
 
-def return_art_map(data_subset, selected_year):
+def return_art_map(data_subset, data_full, selected_year):
     if (data_subset.shape[0] == 0):
         return map_background.properties(title=f'Proportion of HIV patients receiving ART therapy in {selected_year}')
 
@@ -92,7 +92,7 @@ def return_art_map(data_subset, selected_year):
             from_ = alt.LookupData(data_subset, 'country-code', ['Country','year','rate']),
         )
 
-    rate_scale = alt.Scale(domain=[data_subset['rate'].min(), data_subset['rate'].max()])
+    rate_scale = alt.Scale(domain=[data_full['rate'].min(), data_full['rate'].max()])
     rate_color = alt.Color(field = 'rate', type = 'quantitative', scale = rate_scale)
     chart_rate = chart_base.mark_geoshape().encode(
         color = rate_color,
