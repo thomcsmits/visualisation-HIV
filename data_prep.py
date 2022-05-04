@@ -9,7 +9,7 @@ years = [str(i) for i in range(1990, 2021)]
 hiv_df = hiv_df[years]
 
 hiv_df = hiv_df.apply(lambda x: x.str.replace('<', '').str.replace(' ', ''))
-hiv_df = hiv_df.replace('...', -1)
+hiv_df = hiv_df.replace('...', np.nan)
 hiv_df = hiv_df.apply(lambda x: pd.to_numeric(x))
 
 hiv_df = hiv_df.reset_index()
@@ -75,7 +75,7 @@ art_rate = art_rate.merge(
 )
 
 ## Clean population data
-art_pop = art_pop.replace('...', 0)
+art_pop = art_pop.replace('...', np.nan)
 
 ## Calculate percentage change in treated population per year
 art_popchange = art_pop.pct_change(axis = 1)

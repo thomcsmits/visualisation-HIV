@@ -70,14 +70,14 @@ merged_gdp_ph_lower = merged_gdp_ph_lower[merged_gdp_ph_lower['Year'] == year]
 
 ## Loading in charts with subsetted data
 from charts import return_temporal_map, return_temporal_line, return_art_map, return_art_line, return_gdp_plot, return_ph_gdp_chart, return_funding_bar, return_drug_chart, return_drug_bar
-chart_cases_map = return_temporal_map(hiv_selection_upper, hiv_df_long)
+chart_cases_map = return_temporal_map(hiv_selection_upper, hiv_df_long, year)
 chart_cases_line = return_temporal_line(hiv_selection_lower)
-chart_art_map = return_art_map(art_selection_upper)
+chart_art_map = return_art_map(art_selection_upper, year)
 chart_art_line = return_art_line(art_selection_lower)
-chart_gdp_map = return_gdp_plot(gdp_selection_upper, gdp)
-chart_ph_map = return_ph_gdp_chart(ph_selection_upper, ph_gdp)
+chart_gdp_map = return_gdp_plot(gdp_selection_upper, gdp, year)
+chart_ph_map = return_ph_gdp_chart(ph_selection_upper, ph_gdp, year)
 chart_funding_bar = return_funding_bar(merged_gdp_ph_lower)
-chart_drug_map = return_drug_chart(drug_selection_upper, drug)
+chart_drug_map = return_drug_chart(drug_selection_upper, drug, year)
 chart_drug_bar = return_drug_bar(drug_selection_lower)
 
 

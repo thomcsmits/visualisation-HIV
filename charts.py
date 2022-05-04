@@ -20,9 +20,9 @@ map_background = alt.Chart(source
 ).project(project)
 
 
-def return_temporal_map(data_subset, data_full):
+def return_temporal_map(data_subset, data_full, selected_year):
     if (data_subset.shape[0] == 0):
-        return map_background.properties(title=f'HIV cases worldwide')
+        return map_background.properties(title=f'HIV cases worldwide in {selected_year}')
 
     chart_base_map = alt.Chart(source
         ).properties( 
@@ -34,13 +34,13 @@ def return_temporal_map(data_subset, data_full):
             from_ = alt.LookupData(data_subset, 'country-code', ['Country','Year','Cases']),
         )
 
-    cases_scale = alt.Scale(domain=[data_full['Cases'].min(), data_full['Cases'].max()]) #we want the domain to stay the same regardless of subset
+    cases_scale = alt.Scale(domain=[data_full['Cases'].min(), data_full['Cases'].max()], type = 'log') #we want the domain to stay the same regardless of subset
     cases_color = alt.Color(field = 'Cases', type = 'quantitative', scale = cases_scale)
     chart_cases = chart_base_map.mark_geoshape().encode(
         color = cases_color,
         tooltip = ['Country:N', 'Cases:Q']
         ).properties(
-        title=f'HIV cases worldwide'
+        title=f'HIV cases worldwide in {selected_year}'
     )
 
     chart_cases_map = alt.vconcat(map_background + chart_cases
@@ -78,9 +78,9 @@ def return_temporal_line(data_subset):
 
 
 
-def return_art_map(data_subset):
+def return_art_map(data_subset, selected_year):
     if (data_subset.shape[0] == 0):
-        return map_background.properties(title=f'Proportion of HIV patients receiving ART therapy')
+        return map_background.properties(title=f'Proportion of HIV patients receiving ART therapy in {selected_year}')
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -98,7 +98,7 @@ def return_art_map(data_subset):
         color = rate_color,
         tooltip = ['Country:N', 'rate:Q']
         ).properties(
-        title = f'Proportion of HIV patients receiving ART therapy'
+        title = f'Proportion of HIV patients receiving ART therapy in {selected_year}'
     )
 
     chart_art_map = alt.vconcat(map_background + chart_rate
@@ -130,9 +130,9 @@ def return_art_line(data_subset):
     return chart_treatment_change
 
 
-def return_gdp_plot(data_subset, data_full):
+def return_gdp_plot(data_subset, data_full, selected_year):
     if (data_subset.shape[0] == 0):
-        return map_background.properties(title=f'Global GDP Distribution')
+        return map_background.properties(title=f'Global GDP distribution in {selected_year}')
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -151,7 +151,7 @@ def return_gdp_plot(data_subset, data_full):
         color = rate_color,
         tooltip=["GDP_in_dollars:N", "Country:O", "Year:O"]
         ).properties(
-        title=f'Global GDP'
+        title=f'Global GDP distribution in {selected_year}'
         )
     
     chart_gdp_map = alt.vconcat(map_background + chart_gdp
@@ -163,9 +163,9 @@ def return_gdp_plot(data_subset, data_full):
 
 
 ## GDP % Spent on Healthcare Data World Map
-def return_ph_gdp_chart(data_subset, data_full):
+def return_ph_gdp_chart(data_subset, data_full, selected_year):
     if (data_subset.shape[0] == 0):
-        return map_background.properties(title=f'% of GDP spent on Healthcare Worldwide')
+        return map_background.properties(title=f'% of GDP spent on healthcare per country in {selected_year}')
 
     chart_base = alt.Chart(source
         ).properties( 
@@ -184,7 +184,7 @@ def return_ph_gdp_chart(data_subset, data_full):
         color = rate_color,
         tooltip=["GDP_percent_towards_health:N", "Country:O"]
         ).properties(
-        title=f'Percent of GDP spent on healthcare'
+        title=f'% of GDP spent on healthcare per country in {selected_year}'
         )
 
     chart_ph_gdp_map = alt.vconcat(map_background + chart_ph_gdp
@@ -214,9 +214,9 @@ def return_funding_bar(data_subset):
 
 
 ## Drug related Death Map
-def return_drug_chart(data_subset, data_full):
+def return_drug_chart(data_subset, data_full, selected_year):
     if (data_subset.shape[0] == 0):
-        return map_background.properties(title=f'Global Death Rate due to Drug Abuse')
+        return map_background.properties(title=f'Global death rate due to drug abuse in {selected_year}')
 
     chart_base = alt.Chart(source
     ).properties( 
@@ -234,7 +234,7 @@ def return_drug_chart(data_subset, data_full):
         color = rate_color,
         tooltip=["Drug_Deaths:N", "Country:O"]
         ).properties(
-        title=f'Global deaths due to drug abuse'
+        title=f'Global death rate due to drug abuse in {selected_year}'
         )
     
     chart_drug_map = alt.vconcat(map_background + chart_drug_death
@@ -254,7 +254,7 @@ def return_drug_bar(data_subset):
                 color=alt.Color('sum(Drug_Deaths):Q', legend=None, scale=alt.Scale(scheme='purplered')),
                 tooltip=["sum(Drug_Deaths):Q", "Country"]
             ).properties(
-                title="Countries with maximum deaths due to drug abuse",
+                title="Total deaths due to drugs between 1990-2020",
                 width=width,
                 height=height * 1.5
             ).transform_window(
