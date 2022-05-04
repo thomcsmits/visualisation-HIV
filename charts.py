@@ -242,9 +242,7 @@ def return_drug_bar(data_subset):
             ).transform_window(
             rank='rank(Drug_Deaths)',
             sort=[alt.SortField('Drug_Deaths', order='descending')]
-            #).transform_filter(
-            #    (alt.datum.rank < 30)
-                )
+            )
 
     return drug_bar
 
