@@ -1,8 +1,6 @@
 ## Imports
-import numpy as np
 import pandas as pd
-import altair as alt
-import streamlit as st
+from code_mappings import *
 
 ## Read in raw data and clean
 hiv_df = pd.read_csv('data/hiv_temporal.csv', index_col = 0)
@@ -19,15 +17,7 @@ hiv_df = hiv_df.reset_index()
 ## add country codes
 country_df = pd.read_csv('https://raw.githubusercontent.com/hms-dbmi/bmi706-2022/main/cancer_data/country_codes.csv', dtype = {'conuntry-code': str})
 
-## not all countries are written the same. Dict for conversion:
-country_mapping = {
-    "Democratic People's Republic of Korea" : "Korea (Democratic People's Republic of)",
-    'Democratic Republic of the Congo' : 'Congo, Democratic Republic of the',
-    'Republic of Korea' : 'Korea, Republic of',
-    'Republic of Moldova' : 'Moldova, Republic of',
-    'United Kingdom' : 'United Kingdom of Great Britain and Northern Ireland',
-    'United Republic of Tanzania' : 'Tanzania, United Republic of',
-    'United States' : 'United States of America'}
+## Not all countries are written the same way. country_mapping is an imported dictionary.
 for index, row in hiv_df.iterrows():
   if row['Country'] in country_mapping.keys():
     hiv_df.iloc[index, 0] = country_mapping[row['Country']]
@@ -59,42 +49,7 @@ art_pop = pd.read_csv('data/ART_treatment_pop.csv', index_col = 0)
 art_rate.reset_index(inplace=True)
 art_rate = art_rate.rename(columns = {'index':'Country'})
 
-## not all countries are written the same. Dict for conversion:
-art_mapping = {'Bolivia(PlurinationalStateof)' : 'Bolivia (Plurinational State of)',
- 'BosniaandHerzegovina' : 'Bosnia and Herzegovina',
- 'BruneiDarussalam' : 'Brunei Darussalam',
- 'BurkinaFaso' : 'Burkina Faso',
- 'CaboVerde' : 'Cabo Verde',
- 'CentralAfricanRepublic' : 'Central African Republic',
- 'CostaRica' : 'Costa Rica',
- "Côted'Ivoire" : "Côte d'Ivoire",
- "DemocraticPeople'sRepublicofKorea" : "Korea (Democratic People's Republic of)",
- 'DemocraticRepublicoftheCongo' : 'Congo, Democratic Republic of the',
- 'DominicanRepublic' : 'Dominican Republic',
- 'ElSalvador' : 'El Salvador',
- 'EquatorialGuinea' : 'Equatorial Guinea',
- 'Iran(IslamicRepublicof)' : 'Iran (Islamic Republic of)',
- "LaoPeople'sDemocraticRepublic" : "Lao People's Democratic Republic",
- 'NewZealand' : 'New Zealand',
- 'NorthMacedonia' : 'North Macedonia',
- 'PapuaNewGuinea' : 'Papua New Guinea',
- 'RepublicofKorea' : 'Korea, Republic of',
- 'RepublicofMoldova' : 'Moldova, Republic of',
- 'RussianFederation' : 'Russian Federation',
- 'SaoTomeandPrincipe' : 'Sao Tome and Principe',
- 'SaudiArabia' : 'Saudi Arabia',
- 'SierraLeone' : 'Sierra Leone',
- 'SouthAfrica' : 'South Africa',
- 'SouthSudan' : 'South Sudan',
- 'SriLanka' : 'Sri Lanka',
- 'SyrianArabRepublic' : 'Syrian Arab Republic',
- 'TrinidadandTobago' : 'Trinidad and Tobago',
- 'UnitedArabEmirates' : 'United Arab Emirates',
- 'UnitedKingdom' : 'United Kingdom of Great Britain and Northern Ireland',
- 'UnitedRepublicofTanzania' : 'Tanzania, United Republic of',
- 'UnitedStates' : 'United States of America',
- 'Venezuela(BolivarianRepublicof)' : 'Venezuela (Bolivarian Republic of)',
- 'VietNam' : 'Viet Nam'}
+## Not all countries are written the same way. art_mapping is an imported dictionary.
 for index, row in art_rate.iterrows():
   if row['Country'] in art_mapping.keys():
     art_rate.iloc[index, 0] = art_mapping[row['Country']]
