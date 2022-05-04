@@ -112,6 +112,12 @@ art_rate['rate'] = art_rate['rate'].replace('...', 0)
 art_rate = art_rate.astype({'year':'int'})
 art_rate = art_rate.astype({'rate':'int'})
 
+art_rate = art_rate.merge(
+    country_df[['Country', 'country-code']],
+    how = 'left',
+    on = 'Country',
+)
+
 ## Clean population data
 art_pop = art_pop.replace('...', 0)
 
