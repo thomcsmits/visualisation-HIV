@@ -26,7 +26,19 @@ st.set_page_config(
 
 ## Set up country select in sidebar
 with st.sidebar: 
+    ## Select country
     countries = st.multiselect("Countries", hiv_df_long["Country"].unique())
+
+    ## On worldmap, highlight all or only selected countries
+    show_all = st.radio('Do you want to display all countries or only selected?', ('All', 'Selected'))
+
+    ## Retrieve info on which to compare to temporal changes
+    topic_selection1 = st.radio('Do you want to see all charts or compare two topics?', ('All', 'Two'))
+
+    if topic_selection1 == 'Two':
+        topic_selection2 = st.radio('What topic do you want to see on the left?', ('Cases', 'ART coverage', 'GDP', 'Healthcare funding', 'Drug deaths'))
+        topic_selection3 = st.radio('What topic do you want to see on the right?', ('Cases', 'ART coverage', 'GDP', 'Healthcare funding', 'Drug deaths'))
+
 
 hiv_selection_lower = hiv_df_long[hiv_df_long['Country'].isin(countries)]
 art_selection_lower = art_popchange[art_popchange['Country'].isin(countries)]
@@ -44,8 +56,6 @@ art_selection_upper = art_rate[art_rate['year'] == year]
 gdp_selection_upper = gdp[gdp['Year'] == year]
 drug_selection_upper = drug[drug['Year'] == year]
 ph_selection_upper = ph_gdp[ph_gdp['Year'] == year]
-
-show_all = st.radio('Do you want to display all countries or only selected?', ('All', 'Selected'))
 
 if show_all == 'Selected':
     hiv_selection_upper = hiv_selection_upper[hiv_selection_upper['Country'].isin(countries)]
@@ -67,9 +77,6 @@ chart_drug_map = return_drug_chart(drug_selection_upper, drug)
 chart_drug_bar = return_drug_bar(drug_selection_lower)
 
 
-## Retrieve info on which to compare to temporal changes
-topic_selection1 = st.radio('Do you want to see all charts or compare two topics?', ('All', 'Two'))
-
 def select_correct_chart(topic_selection_choice):
     if topic_selection_choice == 'Cases':
         return chart_cases_map, chart_cases_line
@@ -82,10 +89,9 @@ def select_correct_chart(topic_selection_choice):
     if topic_selection_choice == 'Drug deaths':
         return chart_drug_map, chart_drug_bar
 
+
 if topic_selection1 == 'Two':
-    topic_selection2 = st.radio('What topic do you want to see on the left?', ('Cases', 'ART coverage', 'GDP', 'Healthcare funding', 'Drug deaths'))
     left_map, left_extra = select_correct_chart(topic_selection2)
-    topic_selection3 = st.radio('What topic do you want to see on the right?', ('Cases', 'ART coverage', 'GDP', 'Healthcare funding', 'Drug deaths'))
     right_map, right_extra = select_correct_chart(topic_selection3)
 
     ## Displaying in streamlit with layout
