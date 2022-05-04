@@ -1,9 +1,6 @@
 ## Imports
-import numpy as np
-import pandas as pd
 import altair as alt
 import streamlit as st
-from vega_datasets import data
 
 ## Load data
 from data_prep import export_hiv
