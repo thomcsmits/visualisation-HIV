@@ -136,3 +136,111 @@ def return_art_line(data_subset):
     )
 
     return chart_treatment_change
+
+
+##################################################################################################
+## GDP Data World Map
+
+def return_gdp_plot(data):
+    if (data.shape[0] == 0):
+        return map_background.properties(title=f'Global GDP Distribution')
+    gdp_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+
+    chart_base = alt.Chart(source
+        ).properties( 
+            width=width,
+            height=height
+        ).project(project
+        ).transform_lookup(
+            lookup = "id",
+            from_= alt.LookupData(gdp_graph, "country-code", ['Country', 'Year', 'GDP_in_dollars']),
+        )
+
+    # fix the color schema so that it will not change upon user selection
+    rate_scale = alt.Scale(domain=[gdp_graph['GDP_in_dollars'].min(), gdp_graph['GDP_in_dollars'].max()], scheme = "orangered")
+    rate_color = alt.Color(field="GDP_in_dollars", type="quantitative", scale=rate_scale)
+    chart_gdp = chart_base.mark_geoshape().encode(
+        color = rate_color,
+        # P3.3 tooltip
+        tooltip=["GDP_in_dollars:N", "Country:O", "Year:O"]
+        ).properties(
+        title=f'Global GDP'
+        )
+    
+    chart_gdp_map = alt.vconcat(map_background + chart_gdp
+    ).resolve_scale(
+        color = 'independent'
+    )
+
+    return chart_gdp_map
+
+
+## GDP % Spent on Healthcare Data World Map
+
+def return_ph_gdp_chart(data):
+    if (data.shape[0] == 0):
+        return map_background.properties(title=f'% of GDP spent on Healthcare Worldwide')
+    ph_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+
+    chart_base = alt.Chart(source
+        ).properties( 
+            width=width,
+            height=height
+        ).project(project
+        ).transform_lookup(
+            lookup = "id",
+            from_= alt.LookupData(ph_graph, "country-code", ['Country', 'Year', 'GDP_percent_towards_health']),
+        )
+
+    # fix the color schema so that it will not change upon user selection
+    rate_scale = alt.Scale(domain=[ph_graph['GDP_percent_towards_health'].min(), ph_graph['GDP_percent_towards_health'].max()], scheme = "greenblue")
+    rate_color = alt.Color(field='GDP_percent_towards_health', type="quantitative", scale=rate_scale)
+    chart_ph_gdp = chart_base.mark_geoshape().encode(
+        color = rate_color,
+        tooltip=["GDP_percent_towards_health:N", "Country:O"]
+        ).properties(
+        title=f'Percent of GDP spent on healthcare'
+        )
+
+    chart_ph_gdp_map = alt.vconcat(map_background + chart_ph_gdp
+    ).resolve_scale(
+        color = 'independent'
+    )
+
+    return chart_ph_gdp_map
+
+
+## Drug related Death Map
+
+def return_drug_chart(data):
+    if (data.shape[0] == 0):
+        return map_background.properties(title=f'Global Death Rate due to Drug Abuse')
+
+    drug_graph = data.groupby(['Country', 'Year', 'country-code']).sum().reset_index()
+    
+    chart_base = alt.Chart(source
+    ).properties( 
+        width=width,
+        height=height
+    ).project(project
+    ).transform_lookup(
+        lookup = "id",
+        from_= alt.LookupData(drug_graph, "country-code", ['Country', 'Year', 'Drug_Deaths']),
+    )
+
+    rate_scale = alt.Scale(domain=[drug_graph['Drug_Deaths'].min(), drug_graph['Drug_Deaths'].max()], scheme = "purplered")
+    rate_color = alt.Color(field='Drug_Deaths', type="quantitative", scale=rate_scale)
+    chart_drug_death = chart_base.mark_geoshape().encode(
+        color = rate_color,
+        tooltip=["Drug_Deaths:N", "Country:O"]
+        ).properties(
+        title=f'Global deaths due to drug abuse'
+        )
+    
+    chart_drug_map = alt.vconcat(map_background + chart_drug_death
+    ).resolve_scale(
+        color = 'independent'
+    )
+
+    return chart_drug_map
+
